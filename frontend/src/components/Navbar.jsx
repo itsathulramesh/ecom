@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 
-const Navbar = () => {
-  const { user, logout } = useAuth()
+      const Navbar = () => {
+    const { user, logout } = useAuth()
   const { getCartCount } = useCart()
 
   return (

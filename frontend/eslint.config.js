@@ -1,47 +1,28 @@
+import js from "@eslint/js";
 import globals from "globals";
-import pluginJs from "@eslint/js";
-import pluginReactConfig from "eslint-plugin-react/configs/recommended.js";
-import { fixupConfigRules } from "@eslint/compat";
-import tsEslint from "typescript-eslint";
-import pluginReactRefresh from "eslint-plugin-react-refresh";
+import tseslint from "typescript-eslint";
+import { defineConfig } from "eslint/config";
 
-export default [
-  { 
-    files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
-    ignores: ["dist/**", "node_modules/**"]
-  },
-  { languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } } },
-  { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
-  // Configuration for test files
+export default defineConfig([
   {
-    files: ["**/*.{test.js,test.jsx,test.ts,test.tsx}"],
+    ignores: ["dist/**"],
+
     languageOptions: {
-      globals: {
-        ...globals.jest,
-      },
+      globals: { ...globals.browser, ...globals.es2021 }
     },
+
+    // DO NOT put "@eslint/js" inside plugins — it's not a plugin
+    extends: [
+      js.configs.recommended,                     // JavaScript rules
+      ...tseslint.configs.recommended,            // TS rules
+    ],
   },
-  pluginJs.configs.recommended,
-  ...tsEslint.configs.recommended,
-  ...fixupConfigRules(pluginReactConfig),
+
   {
-    plugins: {
-      "react-refresh": pluginReactRefresh,
-    },
     settings: {
       react: {
         version: "detect"
       }
-    },
-    rules: {
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
-      "react/react-in-jsx-scope": "off",
-      "react/prop-types": "off",
-      "@typescript-eslint/no-unused-vars": "warn",
-      "@typescript-eslint/no-require-imports": "off"
-    },
-  },
-];
+    }
+  }
+]);

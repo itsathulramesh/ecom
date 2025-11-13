@@ -1,6 +1,8 @@
+
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import App from './App';
+import { describe, it, expect } from 'vitest'; // Explicitly import test globals
 
 describe('App', () => {
   it('renders the Navbar', () => {

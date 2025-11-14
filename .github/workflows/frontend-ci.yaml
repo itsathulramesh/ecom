@@ -118,7 +118,7 @@ jobs:
           docker load -i frontend-image.tar
 
       - name: Run Trivy vulnurability scan
-        uses: aquasecurity/trivy-action@v0.22.0
+        uses: aquasecurity/trivy-action@v0.67.2
         with:
           image-ref: frontend:ci-build
           format: 'table'

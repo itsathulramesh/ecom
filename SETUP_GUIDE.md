@@ -99,8 +99,5 @@ npm run dev
 ### Admin user already exists
 If you see "Admin user already exists", you can use the existing credentials or manually delete the admin user from MongoDB and run `npm run create-admin` again.
 
-### Cannot connect to MongoDB
-Make sure MongoDB is running and the connection string in `.env` is correct.
-
 ### Port already in use
 If port 5000 or 3000 is already in use, change the PORT in backend `.env` or frontend `vite.config.js`.

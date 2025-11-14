@@ -11,12 +11,9 @@ app.use('/api/auth', authRoutes);
 
 describe('Auth API', () => {
   beforeAll(async () => {
-    const mongoUri = process.env.MONGO_URI_TEST || 'mongodb://localhost:27017/ecom-test';
-    await mongoose.connect(mongoUri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-  });
+    const mongoUri = process.env.MONGO_URI_TEST || 'mongodb://root:example@localhost:27017/ecom-test?authSource=admin';
+    await mongoose.connect(mongoUri);
+  }, 10000); // 10 second timeout
 
   afterEach(async () => {
     await User.deleteMany({});
@@ -24,7 +21,7 @@ describe('Auth API', () => {
 
   afterAll(async () => {
     await mongoose.connection.close();
-  });
+  }, 10000); // 10 second timeout
 
   it('should register a new user', async () => {
     const res = await request(app)

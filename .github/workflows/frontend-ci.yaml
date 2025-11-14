@@ -191,7 +191,7 @@ jobs:
             • **Scan Image:** ${{ needs.Scan-Image.result }}
 
             • **Push to Docker Hub:** ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' 
-                && needs["Push-To-Docker-Hub"].result 
+                && needs.Push-To-Docker-Hub.result 
                 || 'skipped' }}
 
             🔁 *Branch:* `${{ github.ref_name }}`

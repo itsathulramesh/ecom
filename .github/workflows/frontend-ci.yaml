@@ -171,14 +171,14 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/ecom-frontend:${{ secrets.IMAGE_TAG_VERSION }} 
 
-  Notify-On_Telegram:
+    Notify-On-Telegram:
     name: Notify on Telegram
     runs-on: ubuntu-latest
-    needs: [Lint, Test, Build, Scan-Image, Push-To-Docker-Hub]
+    needs: [Lint, Test, Build, Scan-Image]
 
     steps:
       - name: Send Telegram Notification
-        uses: appleboy/telegram-action@v0.3.0
+        uses: appleboy/telegram-action@v0.1.0
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -188,4 +188,4 @@ jobs:
             Test: ${{ needs.Test.result }}
             Build: ${{ needs.Build.result }}
             Scan Image: ${{ needs.Scan-Image.result }}
-            Push to Docker Hub: ${{ needs.Push-To-Docker-Hub.result }}
+            Push to Docker Hub: ${{ needs.Push-To-Docker-Hub.result || 'skipped' }}

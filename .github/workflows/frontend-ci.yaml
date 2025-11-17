@@ -167,7 +167,7 @@ jobs:
       - name : Tag Docker image
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          docker tag frontend:ci-build ${{ secrets.DOCKER_HUB_USERNAME }}/ecom-frontend:${{ secrets.IMAGE_TAG_VERSION}}
+          docker tag frontend:ci-build ${{ secrets.DOCKER_HUB_USERNAME }}/ecom:frontend-${{ secrets.IMAGE_TAG_VERSION }}
 
       - name : Push Docker image
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

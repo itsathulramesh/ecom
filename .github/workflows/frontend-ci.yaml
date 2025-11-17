@@ -172,7 +172,7 @@ jobs:
       - name : Push Docker image
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/ecom-frontend:${{ secrets.IMAGE_TAG_VERSION }} 
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/ecom:frontend-${{ secrets.IMAGE_TAG_VERSION }} 
 
   Notify-On-Telegram:
     name: Notify on Telegram

@@ -15,7 +15,7 @@ on:
       - main
     paths:
       - "backend/**"
-      - ".github/workflows/backedn-ci.yaml"
+      - ".github/workflows/backend-ci.yaml"
 
 jobs: 
   Lint:

@@ -1,0 +1,25 @@
+name: Frontend CD
+
+on:
+  workflow_dispatch:
+  
+concurrency:
+  group: frontend-cd-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  packages: write
+
+jobs:
+
+  Get-Docke-Image:
+    name: Get Docker Image From Artifact
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-image

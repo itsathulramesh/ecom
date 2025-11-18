@@ -110,7 +110,7 @@ jobs:
       
       - name: Load Docker Image
         run: |
-          docker load -i backend_ci_build.tar
+          docker load -i backend_build_ci.tar
       
       - name: Run Trivy Scan
         uses: aquasecurity/trivy-action@0.28.0
@@ -136,7 +136,7 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: |
-            ⚙️ Pull Request Notifier From Backend CI
+            ⚙️ PR Notifier From Backend CI
 
             🧹 Lint Test: ${{ needs.Lint.result }}
             🧪 Unit Test: ${{ needs.Test.result }}

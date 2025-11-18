@@ -11,12 +11,6 @@ on:
     paths:  #only run on changes to frontend code or this workflow file
       - "frontend/**"
       - ".github/workflows/frontend-ci.yaml"
-  push:
-    branches:
-      - main
-    paths:  
-      - "frontend/**"
-      - ".github/workflows/frontend-ci.yaml"
 
 #workflow settings - This prevents multiple runs from piling up when you push several commits quickly.
 concurrency: 
@@ -140,44 +134,10 @@ jobs:
           name: trivy-frontend-report
           path: trivy-report.txt
         if: always()
-
-  Push-To-Docker-Hub:
-    name: Push Frontend Image to Docker Hub
-    runs-on: ubuntu-latest
-    needs: Scan-Image
-
-    steps:
-      - name: Download image artifact   
-        uses: actions/download-artifact@v4
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        with:
-          name: frontend-image
-
-      - name: Load Docker Image
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: | 
-          docker load -i frontend_ci_build.tar
-
-      - name: Docker Hub login
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      
-      - name : Tag Docker image
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          docker tag frontend:ci-build ${{ secrets.DOCKER_HUB_USERNAME }}/ecom:frontend-${{ secrets.IMAGE_TAG_VERSION }}
-
-      - name : Push Docker image
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/ecom:frontend-${{ secrets.IMAGE_TAG_VERSION }} 
-
   Notify-On-Telegram:
     name: Notify on Telegram
     runs-on: ubuntu-latest
-    needs: [Lint, Test, Build, Scan-Image, Push-To-Docker-Hub]
+    needs: [Lint, Test, Build, Scan-Image]
     if: always()
 
     steps:
@@ -187,17 +147,13 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: |
-            ⚙️ *Frontend CI Pipeline Result*
+            ⚙️ Pull Request Notifier From Frontend CI
 
             🧹 Lint Test: ${{ needs.Lint.result }}
             🧪 Unit Test: ${{ needs.Test.result }}
             🔨 Docker Image Build: ${{ needs.Build.result }}
             🛡️ Image Scan: ${{ needs.Scan-Image.result }}
 
-            🐳 Push to Docker Hub: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' 
-                && needs.Push-To-Docker-Hub.result 
-                || 'skipped' }}
-
-            🔁 *Branch:* `${{ github.ref_name }}`
-            🧑‍💻 *Triggered by:* `${{ github.actor }}`
-            📦 *Repository:* `${{ github.repository }}`
+            🔁 Branch: `${{ github.ref_name }}`
+            🧑‍💻 Triggered by: `${{ github.actor }}`
+            📦 Repository: `${{ github.repository }}`

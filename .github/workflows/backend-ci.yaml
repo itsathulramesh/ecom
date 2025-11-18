@@ -6,6 +6,7 @@ on:
   pull_request:
     branches:
       - develop
+      - main
     paths:
       - "backend/**"
       - ".github/workflows/backend-ci.yaml"
@@ -103,21 +104,45 @@ jobs:
 
     steps:
       - name: Download Image Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with: 
           name: backend-image
       
       - name: Load Docker Image
         run: |
-          docker load -i backend_ci_build.tar
+          docker load -i backend_build_ci.tar
       
       - name: Run Trivy Scan
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: backend-ci-build
+          image-ref: backend:ci-build
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
           output: 'trivy-report.txt'
+      
+  Notify-On-Telegram:
+    name: Notify on Telegram
+    runs-on: ubuntu-latest
+    needs: [Lint, Test, Build, Scan-Image]
+    if: always()
+
+    steps:
+      - name: Send Telegram Notification
+        uses: appleboy/telegram-action@v0.1.0
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            ⚙️ PR Notifier From Backend CI
+
+            🧹 Lint Test: ${{ needs.Lint.result }}
+            🧪 Unit Test: ${{ needs.Test.result }}
+            🔨 Docker Image Build: ${{ needs.Build.result }}
+            🛡️ Image Scan: ${{ needs.Scan-Image.result }}
+
+            🔁 Branch: `${{ github.ref_name }}`
+            🧑‍💻 Triggered by: `${{ github.actor }}`
+            📦 Repository: `${{ github.repository }}`

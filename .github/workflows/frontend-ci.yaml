@@ -21,7 +21,7 @@ on:
 #workflow settings - This prevents multiple runs from piling up when you push several commits quickly.
 concurrency: 
   group: frontend-ci-${{ github.ref }} #Groups all runs for this workflow + this branch.
-  cancel-in-progress: true #Cancels the previous run when a new commit arrives.
+  cancel-in-progress: true #Cancels the previous run when a new commit arrives in short time interval (the old ci is not done yet).
 
 permissions:
   contents: read

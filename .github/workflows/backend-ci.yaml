@@ -122,7 +122,13 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
           output: 'trivy-report.txt'
-      
+      - name: Upload Trivy report (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-frontend-report
+          path: trivy-report.txt
+        if: always()
+        
   Notify-On-Telegram:
     name: Notify on Telegram
     runs-on: ubuntu-latest

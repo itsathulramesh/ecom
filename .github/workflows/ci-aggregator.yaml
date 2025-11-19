@@ -1,0 +1,30 @@
+name: CI Aggregator
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  summary-check:
+    name: Aggregator / Required CI Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Initialize CI Gate
+        run: |
+          echo "🔎 CI Aggregator Started"
+          echo "PR Number: ${{ github.event.number }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Commit: ${{ github.sha }}"
+
+      - name: Finalize
+        run: |
+          echo "✅ Aggregator completed successfully."
+          echo "This workflow exists to ensure required status checks "
+          echo "are always present, even when path-based CI workflows "
+          echo "do not run for this pull request."

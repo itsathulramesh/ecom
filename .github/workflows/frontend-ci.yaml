@@ -24,6 +24,7 @@ permissions:
 
 #workflow jobs
 jobs:
+
   Lint: #Job name
     name: Lint test
     runs-on: ubuntu-latest
@@ -48,6 +49,7 @@ jobs:
         working-directory: frontend
         run: npm run lint  #run lint command
     
+
   Test: 
     name: Test Frontend
     runs-on: ubuntu-latest
@@ -73,6 +75,7 @@ jobs:
         working-directory: frontend
         run: npm test -- --watch=false
 
+
   Build-Scan:
     name: Build And Scan Docker Image
     runs-on: ubuntu-latest
@@ -90,6 +93,7 @@ jobs:
           docker build \
           -t frontend:ci-build \
           ./frontend
+
       - name: Run Trivy vulnurability scan
         uses: aquasecurity/trivy-action@0.28.0
         with:
@@ -108,17 +112,7 @@ jobs:
           name: trivy-frontend-report
           path: trivy-report.txt
         if: always()
-      - name: Save image as artifact
-        if: success()
-        run: |
-          docker save frontend:ci-build -o frontend_ci_build.tar
 
-      - name: Upload Image Artifact
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-image-clean
-          path: frontend_ci_build.tar
 
   Notify-On-Telegram:
     name: Notify on Telegram
@@ -133,12 +127,15 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: |
-            ⚙️ Pull Request Notifier From Frontend CI
+            ⚙️ *PR Notifier Frontend*
 
-            🧹 Lint Test: ${{ needs.Lint.result }}
-            🧪 Unit Test: ${{ needs.Test.result }}
-            🔨 Docker Image Build: ${{ needs.Build-Scan.result }}
+            🧹 Lint Status: *${{ needs.Lint.result }}*
+            🧪 Unit Test Status: *${{ needs.Test.result }}*
+            🐳 Docker Build & Trivy Scan: *${{ needs.Build-Scan.result }}*
 
             🔁 Branch: `${{ github.ref_name }}`
             🧑‍💻 Triggered by: `${{ github.actor }}`
             📦 Repository: `${{ github.repository }}`
+            🔗 PR Link: ${{ github.event.pull_request.html_url }}
+
+            ✔️ CI workflow finished. Review results above.

@@ -67,13 +67,30 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: |
-            📦 *Frontend CD Status*
+            🚀 *Frontend Deployment Report (CD)*
 
-            🐳 Docker Push: *${{ needs.Build-and-Push.result }}*
+            🧱 *Build & Push Status*
+            ├─ Docker Build: *${{ needs.Build-and-Push.result }}*
+            ├─ Docker Push: *${{ needs.Build-and-Push.result }}*
+            └─ Image Tag: `frontend-${{ secrets.IMAGE_TAG_VERSION }}`
 
-            🔁 Branch: `${{ github.ref_name }}`
-            👤 Triggered by: `${{ github.actor }}`
-            🔢 Image Tag: `frontend-${{ secrets.IMAGE_TAG_VERSION }}`
-            📦 Repo: `${{ github.repository }}`
+            🐳 *Image Details*
+            ├─ Repository: `${{ secrets.DOCKER_HUB_USERNAME }}/ecom`
+            ├─ Tag: `frontend-${{ secrets.IMAGE_TAG_VERSION }}`
+            └─ Branch: `${{ github.ref_name }}`
 
-            ✔️ CD workflow finished.
+            📌 *Commit Info*
+            ├─ Author: `${{ github.actor }}`
+            ├─ SHA: `${{ github.sha }}`
+            └─ Message: "${{ github.event.head_commit.message }}"
+
+            🔗 *Links*
+            ├─ Repo: https://github.com/${{ github.repository }}
+            └─ Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            🕒 *Timestamp*
+            └─ `${{ github.event.head_commit.timestamp }}`
+
+            📦 *Deployment Complete*
+            ✔️ The Frontend CD workflow has finished. Review the details above.
+

@@ -127,29 +127,15 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: |
-            ⚙️ *Frontend PR CI Report*
+            ⚙️ *PR Notifier Frontend*
 
-            🧪 *CI Status Summary*
-            ├─ 🧹 Lint: *${{ needs.Lint.result }}*
-            ├─ 🧪 Tests: *${{ needs.Test.result }}*
-            └─ 🐳 Docker Build & Trivy Scan: *${{ needs.Build-Scan.result }}*
+            🧹 Lint Status: *${{ needs.Lint.result }}*
+            🧪 Unit Test Status: *${{ needs.Test.result }}*
+            🐳 Docker Build & Trivy Scan: *${{ needs.Build-Scan.result }}*
 
-            🔍 *Pull Request Details*
-            ├─ Title: *${{ github.event.pull_request.title }}*
-            ├─ Author: `${{ github.actor }}`
-            └─ PR Link: ${{ github.event.pull_request.html_url }}
+            🔁 Branch: `${{ github.ref_name }}`
+            🧑‍💻 Triggered by: `${{ github.actor }}`
+            📦 Repository: `${{ github.repository }}`
+            🔗 PR Link: ${{ github.event.pull_request.html_url }}
 
-            📌 *Commit Info*
-            ├─ SHA: `${{ github.sha }}`
-            └─ Message: "${{ github.event.pull_request.head.sha && github.event.pull_request.title }}"
-
-            🌿 *Branch Information*
-            ├─ Source Branch: `${{ github.head_ref }}`
-            └─ Target Branch: `${{ github.base_ref }}`
-
-            🔗 *Workflow Links*
-            └─ Run Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-            ✔️ *CI Completed*
-            Review results above before merging.
-
+            ✔️ CI workflow finished. Review results above.

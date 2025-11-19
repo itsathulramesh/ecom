@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   Build-and-Push:
-    name: Build and Push Backend Image
+    name: Build and Push Frontend Image
     runs-on: ubuntu-latest
     
     steps:
@@ -63,29 +63,14 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: |
-            🚀 *backend Deployment Report (CD)*
+            📦 *Backend CD Status*
 
-            🧱 *Build & Push Status*
-            ├─ Docker Build: *${{ needs.Build-and-Push.result }}*
-            ├─ Docker Push: *${{ needs.Build-and-Push.result }}*
-            └─ Image Tag: `backend-${{ secrets.IMAGE_TAG_VERSION }}`
+            🐳 Docker Push: *${{ needs.Build-and-Push.result }}*
 
-            🐳 *Image Details*
-            ├─ Repository: `${{ secrets.DOCKER_HUB_USERNAME }}/ecom`
-            ├─ Tag: `backend-${{ secrets.IMAGE_TAG_VERSION }}`
-            └─ Branch: `${{ github.ref_name }}`
+            🔁 Branch: `${{ github.ref_name }}`
+            👤 Triggered by: `${{ github.actor }}`
+            🔢 Image Tag: `backend-${{ secrets.IMAGE_TAG_VERSION }}`
+            📦 Repo: `${{ github.repository }}`
 
-            📌 *Commit Info*
-            ├─ Author: `${{ github.actor }}`
-            ├─ SHA: `${{ github.sha }}`
-            └─ Message: "${{ github.event.head_commit.message }}"
+            ✔️ CD workflow finished.
 
-            🔗 *Links*
-            ├─ Repo: https://github.com/${{ github.repository }}
-            └─ Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-            🕒 *Timestamp*
-            └─ `${{ github.event.head_commit.timestamp }}`
-
-            📦 *Deployment Complete*
-            ✔️ The Frontend CD workflow has finished. Review the details above.

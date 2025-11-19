@@ -6,6 +6,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-cd.yaml"
 
 concurrency:
   group: backend-cd-${{ github.ref }}
@@ -74,6 +77,6 @@ jobs:
             👤 Triggered by: ${{ github.actor }}
             🔢 Image Tag: backend-${{ secrets.IMAGE_TAG_VERSION }}
             📦 Repo: ${{ github.repository }}
-            
+
             ✔️ CD workflow finished.
 

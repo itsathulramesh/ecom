@@ -8,6 +8,9 @@ on:
   push:
     branches:
       - main
+    paths:  #only run on changes to frontend code or this workflow file
+      - "frontend/**"
+      - ".github/workflows/frontend-cd.yaml"
 
 #workflow settings - prevent overlapping deployments
 concurrency:
@@ -78,5 +81,5 @@ jobs:
             👤 Triggered by: ${{ github.actor }}
             🔢 Image Tag: frontend-${{ secrets.IMAGE_TAG_VERSION }}
             📦 Repo: ${{ github.repository }}
-            
+
             ✔️ CD workflow finished.

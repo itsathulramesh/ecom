@@ -117,7 +117,7 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: |
-            ⚙️ PR Notifier From Backend CI
+            ⚙️ PR NotifierBackend
 
             🧹 Lint Test: ${{ needs.Lint.result }}
             🧪 Unit Test: ${{ needs.Test.result }}
@@ -126,3 +126,6 @@ jobs:
             🔁 Branch: `${{ github.ref_name }}`
             🧑‍💻 Triggered by: `${{ github.actor }}`
             📦 Repository: `${{ github.repository }}`
+            🔗 PR Link: ${{ github.event.pull_request.html_url }}
+
+            ✅ CI workflow finished. Review results above.

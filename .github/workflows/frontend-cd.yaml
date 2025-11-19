@@ -5,6 +5,10 @@ name: Frontend CD
 on:
   workflow_dispatch:
 
+  push:
+    branches:
+      - main
+
 #workflow settings - prevent overlapping deployments
 concurrency:
   group: frontend-cd-${{ github.ref }}
@@ -67,13 +71,16 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: |
-            📦 *Frontend CD Status*
+            ⚙️ Frontend CD Status
 
-            🐳 Docker Push: *${{ needs.Build-and-Push.result }}*
+            🐳 Docker Push: ${{ needs.Build-and-Push.result }}
 
-            🔁 Branch: `${{ github.ref_name }}`
-            👤 Triggered by: `${{ github.actor }}`
-            🔢 Image Tag: `frontend-${{ secrets.IMAGE_TAG_VERSION }}`
-            📦 Repo: `${{ github.repository }}`
+            🔁 Branch: ${{ github.ref_name }}
+
+            👤 Triggered by: ${{ github.actor }}
+
+            🔢 Image Tag: frontend-${{ secrets.IMAGE_TAG_VERSION }}
+
+            📦 Repo: ${{ github.repository }}
 
             ✔️ CD workflow finished.

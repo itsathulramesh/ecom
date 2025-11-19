@@ -127,15 +127,15 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: |
-            ⚙️ *PR Notifier Frontend*
+            ⚙️ PR Notifier Frontend
 
-            🧹 Lint Status: *${{ needs.Lint.result }}*
-            🧪 Unit Test Status: *${{ needs.Test.result }}*
-            🐳 Docker Build & Trivy Scan: *${{ needs.Build-Scan.result }}*
+            🧹 Lint Status: ${{ needs.Lint.result }}
+            🧪 Unit Test Status: ${{ needs.Test.result }}
+            🐳 Docker Build & Trivy Scan: ${{ needs.Build-Scan.result }}
 
             🔁 Branch: `${{ github.ref_name }}`
             🧑‍💻 Triggered by: `${{ github.actor }}`
             📦 Repository: `${{ github.repository }}`
             🔗 PR Link: ${{ github.event.pull_request.html_url }}
 
-            ✔️ CI workflow finished. Review results above.
+            ✅ CI workflow finished. Review results above.

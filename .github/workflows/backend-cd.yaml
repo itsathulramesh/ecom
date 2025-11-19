@@ -2,6 +2,10 @@ name: Backend CD
 
 on:
   workflow_dispatch:
+  
+  push:
+    branches:
+      - main
 
 concurrency:
   group: backend-cd-${{ github.ref }}
@@ -63,14 +67,17 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: |
-            📦 *Backend CD Status*
+            ⚙️ Backend CD Status
 
-            🐳 Docker Push: *${{ needs.Build-and-Push.result }}*
+            🐳 Docker Push: ${{ needs.Build-and-Push.result }}
 
-            🔁 Branch: `${{ github.ref_name }}`
-            👤 Triggered by: `${{ github.actor }}`
-            🔢 Image Tag: `backend-${{ secrets.IMAGE_TAG_VERSION }}`
-            📦 Repo: `${{ github.repository }}`
+            🔁 Branch: ${{ github.ref_name }}
+
+            👤 Triggered by: ${{ github.actor }}
+
+            🔢 Image Tag: backend-${{ secrets.IMAGE_TAG_VERSION }}
+
+            📦 Repo: ${{ github.repository }}
 
             ✔️ CD workflow finished.
 

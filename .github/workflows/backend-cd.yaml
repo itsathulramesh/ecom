@@ -70,14 +70,10 @@ jobs:
             ⚙️ Backend CD Status
 
             🐳 Docker Push: ${{ needs.Build-and-Push.result }}
-
             🔁 Branch: ${{ github.ref_name }}
-
             👤 Triggered by: ${{ github.actor }}
-
             🔢 Image Tag: backend-${{ secrets.IMAGE_TAG_VERSION }}
-
             📦 Repo: ${{ github.repository }}
-
+            
             ✔️ CD workflow finished.
 

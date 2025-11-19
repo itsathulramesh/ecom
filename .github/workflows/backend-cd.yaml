@@ -1,0 +1,42 @@
+name: Backend CD
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: backend-cd-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  packages: write
+
+jobs:
+  Push-Image:
+    name: Push Image to Dockerhub
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-image-clean
+
+      - name: Load Docker Image
+        run: |
+          docker load -i backend_ci_build.tar
+
+      - name: Dockerhub Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME}}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN}}
+
+      - name: Tag Docker Image
+        run: |
+          docker tag frontend:ci-build ${{ secrets.DOCKER_HUB_USERNAME }}/ecom:frontend-${{ secrets.IMAGE_TAG_VERSION }}
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/ecom:frontend-${{ secrets.IMAGE_TAG_VERSION }}

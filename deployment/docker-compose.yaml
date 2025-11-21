@@ -17,8 +17,12 @@ services:
       - ecom-network
 
   frontend:
+    # Option 1: Build from Dockerfile (for development)
     build: ../frontend
-    # image: deployment-frontend:latest
+    
+    # Option 2: Use prebuilt image (uncomment this and comment out 'build' above)
+    # image: your-registry/ecom-frontend:latest
+    
     restart: always
     container_name: frontend
     ports:
@@ -26,7 +30,6 @@ services:
     depends_on:
       - backend
     environment:
-      NODE_ENV: production
       VITE_API_URL: "http://localhost:5000"
     networks:
       - ecom-network

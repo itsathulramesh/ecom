@@ -9,25 +9,19 @@ COPY . .
 RUN npm run build
 
 ############################
-# Stage 2: Serve with Nginx + Runtime Config
+# Stage 2: Serve with Nginx
 ############################
 FROM nginx:alpine
 
-WORKDIR /usr/share/nginx/html
-
 # Copy built files
-COPY --from=builder /app/dist ./
-
-# Add a default runtime-config file
-COPY public/config.js ./config.js
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Add custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy the entrypoint script and make it executable
-COPY entry.sh /docker-entrypoint.sh
+# Copy entrypoint script and make it executable
+COPY scripts/entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
-# Entrypoint
-ENTRYPOINT []
-CMD ["nginx", "-g", "daemon off;"]
+# Use the entrypoint script
+ENTRYPOINT ["/docker-entrypoint.sh"]

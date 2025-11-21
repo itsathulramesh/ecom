@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Ensure /app exists
+      # STEP 1 — Ensure /app directory exists
       - name: Create /app directory on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -19,18 +19,20 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             mkdir -p /home/${{ secrets.EC2_USERNAME }}/app
+            echo "Directory /app is ready"
 
-      # Copy ONLY docker-compose.yaml
-      - name: Copy compose file to EC2
+      # STEP 2 — Copy ONLY docker-compose.yaml from repo
+      # NO folders, NO prod/, NO deployment/, no nested copying
+      - name: Copy docker-compose.yaml to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "deployment/prod/docker-compose.yaml"
-          target: "/home/${{ secrets.EC2_USERNAME }}/app/docker-compose.yaml"
+          target: "/home/${{ secrets.EC2_USERNAME }}/app/"
 
-      # First-time startup
+      # STEP 3 — Start whole application (first-time run)
       - name: Start Application
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -45,3 +47,5 @@ jobs:
             docker compose pull
             docker compose up -d
             docker image prune -f
+
+            echo "EC2 setup completed successfully!"

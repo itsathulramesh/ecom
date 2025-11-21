@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   backend:
-    image: your-registry/backend:1.0.0
+    image: ${DOCKER_HUB_USERNAME}/ecom:{IMAGE_TAG}
     container_name: backend
     restart: always
     environment:
@@ -17,7 +17,7 @@ services:
       - ecom-network
 
   frontend:
-    image: your-registry/frontend:1.0.0
+    image: "${DOCKER_HUB_USERNAME}/ecom-frontend:${IMAGE_TAG}"
     container_name: frontend
     restart: always
     environment:
@@ -30,7 +30,7 @@ services:
       - ecom-network
 
   mongodb:
-    image: mongo:7
+    image: mongo:latest
     container_name: mongodb
     restart: always
     environment:

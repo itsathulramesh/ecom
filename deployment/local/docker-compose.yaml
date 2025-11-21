@@ -1,0 +1,61 @@
+version: '3.9'
+
+services:
+  backend:
+    build: ../../backend
+    container_name: backend
+    restart: always
+    environment:
+      PORT: ${PORT}
+      MONGODB_URI: ${MONGODB_URI}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    networks:
+      - ecom-network
+
+  frontend:
+    build: ../../frontend
+    container_name: frontend
+    restart: always
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - ecom-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
+      MONGO_INITDB_DATABASE: ecommerce
+    ports:
+      - "27017:27017"
+    networks:
+      - ecom-network
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASS}
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH_USERNAME: mongoexpressuser
+      ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
+    ports:
+      - "8081:8081"
+    networks:
+      - ecom-network
+
+networks:
+  ecom-network:

@@ -4,40 +4,44 @@ on:
   workflow_dispatch:
 
 jobs:
-  copy-deployment-files:
-    name: Copy docker-compose to EC2
+  setup-ec2:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Copy deployment folder to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "deployment/prod/*"
-          target: "/home/${{ secrets.EC2_USERNAME }}/app"
-
-      - name: Run Entire Application
+      # Ensure /app exists
+      - name: Create /app directory on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/${{ secrets.EC2_USERNAME }}/app/deployment/prod
+            mkdir -p /home/${{ secrets.EC2_USERNAME }}/app
 
-            # Login to Docker Hub if needed
+      # Copy ONLY docker-compose.yaml
+      - name: Copy compose file to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "deployment/prod/docker-compose.yaml"
+          target: "/home/${{ secrets.EC2_USERNAME }}/app/docker-compose.yaml"
+
+      # First-time startup
+      - name: Start Application
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.EC2_USERNAME }}/app
+
             docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-            # Pull all images defined in docker-compose.yml
             docker compose pull
-
-            # Start or recreate all services
             docker compose up -d
-
-            # Clean only unused images
             docker image prune -f

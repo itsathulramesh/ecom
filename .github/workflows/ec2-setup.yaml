@@ -12,32 +12,63 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Copy deployment folder to EC2
+      # --- FIX 1: Ensure Target Directory Exists ---
+      - name: 🛠️ Setup/Cleanup on EC2 and Create Directory
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          # The -p flag creates the directory and any necessary parent directories
+          script: |
+            TARGET_DIR="/home/${{ secrets.EC2_USERNAME }}/app"
+            mkdir -p $TARGET_DIR
+            
+            # OPTIONAL: Stop any running containers from the previous deployment 
+            # This makes the deployment safer and cleaner before copying new files
+            echo "Attempting to stop and remove previous containers (if any)..."
+            cd $TARGET_DIR || exit 0 # Change directory, exit 0 if it fails to be safe
+            # Use '|| true' to prevent failure if docker-compose is not running
+            docker compose down || true 
+
+      # --- Copy files will now succeed because the directory exists ---
+      - name: 📁 Copy deployment files to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "deployment/prod/*"
+          # This copies the *contents* of deployment/prod into /home/.../app/
+          source: "deployment/prod/*" 
           target: "/home/${{ secrets.EC2_USERNAME }}/app/"
+          # Optional: Use strip_components: 1 if you want to use source: "deployment/prod"
 
-      - name: Run Entire Application
+      - name: 🚀 Run Entire Application on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/${{ secrets.EC2_USERNAME }}/app
-
-            # Login to Docker Hub if needed
+            TARGET_DIR="/home/${{ secrets.EC2_USERNAME }}/app"
+            
+            # Navigate to the deployment directory
+            cd $TARGET_DIR
+            
+            # Login to Docker Hub
+            echo "Logging into Docker Hub..."
             docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
             # Pull all images defined in docker-compose.yml
+            echo "Pulling latest images..."
             docker compose pull
 
-            # Start or recreate all services
-            docker compose up -d
+            # Start or recreate all services using the new images
+            echo "Starting containers..."
+            docker compose up -d --remove-orphans # --remove-orphans removes services not in the new compose file
 
-            # Clean only unused images
+            # Clean only unused images (to save disk space)
+            echo "Cleaning up unused images..."
             docker image prune -f
+            
+            echo "Deployment complete."

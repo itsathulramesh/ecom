@@ -19,7 +19,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "deployment/prod/*"
-          target: "/home/${{ secrets.EC2_USERNAME }}/app"
+          target: "/home/${{ secrets.EC2_USERNAME }}/app/"
 
       - name: Run Entire Application
         uses: appleboy/ssh-action@v1.0.3

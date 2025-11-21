@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   backend:
-    image: ${DOCKER_HUB_USERNAME}/ecom:{IMAGE_TAG}
+    image: ${DOCKER_HUB_USERNAME}/ecom:backend-{IMAGE_TAG}
     container_name: backend
     restart: always
     environment:
@@ -17,7 +17,7 @@ services:
       - ecom-network
 
   frontend:
-    image: "${DOCKER_HUB_USERNAME}/ecom-frontend:${IMAGE_TAG}"
+    image: "${DOCKER_HUB_USERNAME}/ecom:frontend-${IMAGE_TAG}"
     container_name: frontend
     restart: always
     environment:

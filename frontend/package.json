@@ -6,7 +6,6 @@
   "scripts": {
     "predev": "node scripts/generate-config.cjs",
     "dev": "vite",
-    "prebuild": "set NODE_ENV=production && node scripts/generate-config.cjs",
     "build": "vite build",
     "lint": "npx eslint src --ext .js,.jsx",
     "test": "vitest run",

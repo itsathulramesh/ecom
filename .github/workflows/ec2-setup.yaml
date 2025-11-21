@@ -1,0 +1,52 @@
+name: EC2 Setup (Copy Compose Files)
+
+on:
+  workflow_dispatch:   # run manually anytime
+
+jobs:
+  copy-deployment-files:
+    name: Copy docker-compose
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Copy everything inside deployment/prod to EC2:/home/ubuntu/app
+      - name: Copy deployment folder to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "deployment/prod/*"
+          target: "/home/${{ secrets.EC2_USERNAME }}/app"
+
+      # Optional: Ensure Docker + Docker Compose are installed
+      - name: Setup EC2 for Docker (Optional)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Install Docker if not installed
+            if ! command -v docker &> /dev/null
+            then
+              echo "Installing Docker..."
+              sudo apt update
+              sudo apt install -y docker.io
+            fi
+
+            # Install Docker Compose if not installed
+            if ! command -v docker compose &> /dev/null
+            then
+              echo "Installing Docker Compose..."
+              sudo curl -L "https://github.com/docker/compose/releases/download/v2.29.2/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+
+            # Create the app folder if missing
+            mkdir -p /home/${{ secrets.EC2_USERNAME }}/app
+
+            echo "Setup completed!"

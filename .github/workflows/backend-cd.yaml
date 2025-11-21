@@ -56,27 +56,30 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/ecom:backend-${{ secrets.IMAGE_TAG_VERSION }}
 
-  # Optional notifier job
-  Notify:
-    name: Notify on Telegram
+  Deploy-on-EC2:
+    name: Deploy on EC2
     runs-on: ubuntu-latest
     needs: Build-and-Push
-    if: always()   # Run even if deployment failed
-
     steps:
-      - name: Send Telegram Notification
-        uses: appleboy/telegram-action@v0.1.0
+      - name: SSH inro EC2 and Deploy
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: |
-            ⚙️ Backend CD Status
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.EC2_USERNAME }}/app
+            echo "Logging in to Docker Hub..."
+            docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-            🐳 Docker Push: ${{ needs.Build-and-Push.result }}
-            🔁 Branch: ${{ github.ref_name }}
-            👤 Triggered by: ${{ github.actor }}
-            🔢 Image Tag: backend-${{ secrets.IMAGE_TAG_VERSION }}
-            📦 Repo: ${{ github.repository }}
+            echo "Pulling latest backend image..."
+            docker compose pull backend
 
-            ✔️ CD workflow finished.
+            echo "Recreating frontend container..."
+            docker compose up -d backend
 
+            echo "Removing old unused images..."
+            docker image prune -f
+
+            echo "Backend deployment completed!"
+  

@@ -1,48 +1,58 @@
 name: EC2 Setup (Copy Compose Files)
 
 on:
+  # Allows you to trigger the workflow manually from the GitHub UI
   workflow_dispatch:
 
 jobs:
   copy-deployment-files:
-    name: Copy docker-compose to EC2
+    name: Deploy Docker Compose to EC2
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: 📦 Checkout repository
         uses: actions/checkout@v4
 
-      # --- FIX 1: Ensure Target Directory Exists ---
-      - name: 🛠️ Setup/Cleanup on EC2 and Create Directory
+      # --- STEP 1: Setup and Pre-Cleanup on EC2 ---
+      - name: 🛠️ Ensure Remote Directory Exists and Clean Up Old Containers
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          # The -p flag creates the directory and any necessary parent directories
           script: |
             TARGET_DIR="/home/${{ secrets.EC2_USERNAME }}/app"
+            
+            # Create the target directory if it doesn't exist
+            echo "Creating target directory: $TARGET_DIR"
             mkdir -p $TARGET_DIR
             
-            # OPTIONAL: Stop any running containers from the previous deployment 
-            # This makes the deployment safer and cleaner before copying new files
-            echo "Attempting to stop and remove previous containers (if any)..."
-            cd $TARGET_DIR || exit 0 # Change directory, exit 0 if it fails to be safe
-            # Use '|| true' to prevent failure if docker-compose is not running
-            docker compose down || true 
+            # Change directory to run docker compose commands
+            cd $TARGET_DIR || exit 0
 
-      # --- Copy files will now succeed because the directory exists ---
-      - name: 📁 Copy deployment files to EC2
+            # Stop and remove any previous running deployment containers
+            echo "Stopping and removing previous containers..."
+            docker compose down || true 
+            
+            # Clean up any leftover nested folders from previous failed runs (like 'deployment/prod')
+            rm -rf $TARGET_DIR/deployment || true 
+
+      # --- STEP 2: Copy Files with Correct Nesting ---
+      - name: 📁 Copy 'deployment/prod' Contents to '/app/'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          # This copies the *contents* of deployment/prod into /home/.../app/
-          source: "deployment/prod/*" 
+          # Source is the directory itself. This ensures all contents are copied.
+          source: "deployment/prod" 
+          # Target is the final destination directory.
           target: "/home/${{ secrets.EC2_USERNAME }}/app/"
-          # Optional: Use strip_components: 1 if you want to use source: "deployment/prod"
+          # This is the key fix: It tells the action to copy the contents of 'prod' 
+          # but strip the leading 'deployment/prod' path, placing files directly in 'app/'.
+          strip_components: 1 
 
+      # --- STEP 3: Run Application ---
       - name: 🚀 Run Entire Application on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -52,7 +62,7 @@ jobs:
           script: |
             TARGET_DIR="/home/${{ secrets.EC2_USERNAME }}/app"
             
-            # Navigate to the deployment directory
+            # Navigate to the deployment directory where docker-compose.yaml now resides
             cd $TARGET_DIR
             
             # Login to Docker Hub
@@ -65,9 +75,9 @@ jobs:
 
             # Start or recreate all services using the new images
             echo "Starting containers..."
-            docker compose up -d --remove-orphans # --remove-orphans removes services not in the new compose file
+            docker compose up -d --remove-orphans
 
-            # Clean only unused images (to save disk space)
+            # Clean up unused images
             echo "Cleaning up unused images..."
             docker image prune -f
             

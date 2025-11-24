@@ -8,12 +8,12 @@ const Home = () => {
     <div>
       <div style={{ textAlign: 'center', padding: '4rem 2rem', minHeight: '70vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: '#2c3e50' }}>
-          Welcome to Our eCommerce Online Ecom Store
+          Welcome to Our Online Ecom Store
         </h1>
         <p style={{ fontSize: '1.3rem', color: '#7f8c8d', marginBottom: '3rem', maxWidth: '600px', margin: '0 auto 3rem' }}>
           {user 
             ? `Welcome back, ${user.name}! Start shopping now.`
-            : 'Please login or register to start shopping and discover amazing products at great prices'
+            : 'Please login or register to start shopping and discover amazing products'
           }
         </p>
         

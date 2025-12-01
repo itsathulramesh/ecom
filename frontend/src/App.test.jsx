@@ -10,6 +10,6 @@ describe('App', () => {
 
   it('renders the Home page by default', () => {
     render(<App />);
-    expect(screen.getByText(/Welcome to Our Online Ecom Store/i)).toBeInTheDocument();
+    expect(screen.getByText(/Welcome to Our Complete Ecom Store/i)).toBeInTheDocument();
   });
 });

@@ -8,7 +8,7 @@ const Home = () => {
     <div>
       <div style={{ textAlign: 'center', padding: '4rem 2rem', minHeight: '70vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: '#2c3e50' }}>
-          Welcome to Our Complete Ecom Store
+          Welcome to Our Ecom Store
         </h1>
         <p style={{ fontSize: '1.3rem', color: '#7f8c8d', marginBottom: '3rem', maxWidth: '600px', margin: '0 auto 3rem' }}>
           {user 

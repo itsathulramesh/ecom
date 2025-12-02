@@ -72,6 +72,6 @@ jobs:
             ~/deploy/switch_to_green.sh
 
             echo "Finalizing BLUE -> GREEN promotion"
-            ~/deploy/finalize_blue_cleanup.sh
+            ~/deploy/blue_cleanup.sh
 
             echo "Backend Blue-Green Deployment Completed Successfully!"
